@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speedometer Gauge</title>
+  <style>
+    canvas {
+      display: block;
+      margin: auto;
+      background: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="gauge" width="300" height="300"></canvas>
+
+  <script>
+    function drawGauge(currentValue, targetValue) {
+      var canvas = document.getElementById('gauge');
+      var ctx = canvas.getContext('2d');
+      var centerX = canvas.width / 2;
+      var centerY = canvas.height / 2;
+      var radius = 100;
+
+      // Clear the canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw outer circle
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI, true);
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = "#ddd";
+      ctx.stroke();
+      ctx.closePath();
+
+      // Draw red zone (0-50%)
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, Math.PI, Math.PI + (Math.PI / 2), false);
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = "#ff6666";
+      ctx.stroke();
+      ctx.closePath();
+
+      // Draw yellow zone (50-80%)
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, Math.PI + (Math.PI / 2), 2.4 * Math.PI, false);
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = "#ffcc66";
+      ctx.stroke();
+      ctx.closePath();
+
+      // Draw green zone (80-100%)
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 2.4 * Math.PI, 2 * Math.PI, false);
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = "#66cc66";
+      ctx.stroke();
+      ctx.closePath();
+
+      // Calculate angle based on the current value
+      var angle = (Math.PI / targetValue) * currentValue + Math.PI;
+
+      // Draw needle
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.lineTo(centerX + radius * Math.cos(angle), centerY + radius * Math.sin(angle));
+      ctx.lineWidth = 5;
+      ctx.strokeStyle = "#000";
+      ctx.stroke();
+      ctx.closePath();
+
+      // Draw center circle
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 10, 0, 2 * Math.PI);
+      ctx.fillStyle = "#000";
+      ctx.fill();
+      ctx.closePath();
+
+      // Draw labels
+      ctx.font = "16px Arial";
+      ctx.fillStyle = "#000";
+      ctx.textAlign = "center";
+      ctx.fillText("0", centerX - radius + 15, centerY + 30);
+      ctx.fillText(targetValue / 2, centerX, centerY + radius + 20);
+      ctx.fillText(targetValue, centerX + radius - 15, centerY + 30);
+    }
+
+    // Update gauge dynamically
+    function updateGauge() {
+      var currentValue = Math.floor(Math.random() * 100);  // Simulating current value
+      var targetValue = 100;  // Set your target value here
+
+      drawGauge(currentValue, targetValue);
+
+      // Update every 2 seconds
+      setTimeout(updateGauge, 2000);
+    }
+
+    // Start updating the gauge when the page loads
+    updateGauge();
+  </script>
+
+</body>
+</html>
