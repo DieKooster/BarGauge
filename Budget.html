@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Budget vs. Spent Gauge</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #f5f5f5;
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+    }
+
+    canvas {
+      display: block;
+      background: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      margin-bottom: 10px;
+      font-size: 24px;
+      font-weight: 400;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <h2 id="gaugeTitle">Budget Overview</h2>
+  <canvas id="gauge" width="400" height="200"></canvas>
+
+  <script>
+    function drawGauge(spentValue, budgetValue, title) {
+      // Set title dynamically
+      document.getElementById('gaugeTitle').textContent = title;
+
+      var canvas = document.getElementById('gauge');
+      var ctx = canvas.getContext('2d');
+      var centerX = canvas.width / 2;
+      var centerY = canvas.height;
+      var radius = 120;
+
+      // Clear the canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw background arc
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, Math.PI, 0, false);
+      ctx.lineWidth = 15;
+      ctx.strokeStyle = "#e6e6e6";
+      ctx.stroke();
+      ctx.closePath();
+
+      // Gradient for the zones
+      var gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+      gradient.addColorStop(0, "#871c07"); // Red
+	  gradient.addColorStop(0.35, "#db310f"); // Red
+      gradient.addColorStop(0.5, "#ffcc66"); // Yellow
+	  gradient.addColorStop(0.875, "#95e827")
+      gradient.addColorStop(1, "#29b50d"); // Green
+
+      // Draw colored arc based on current spending
+      var proportionSpent = spentValue / budgetValue;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, Math.PI, Math.PI + (Math.PI * proportionSpent), false);
+      ctx.lineWidth = 15;
+      ctx.strokeStyle = gradient;
+      ctx.stroke();
+      ctx.closePath();
+
+      // Calculate angle for the needle based on the spent value
+      var angle = Math.PI + (Math.PI * proportionSpent);
+
+      // Draw needle
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.lineTo(centerX + radius * Math.cos(angle), centerY + radius * Math.sin(angle));
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = "#333";
+      ctx.stroke();
+      ctx.closePath();
+
+      // Draw center circle
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 8, 0, 2 * Math.PI);
+      ctx.fillStyle = "#333";
+      ctx.fill();
+      ctx.closePath();
+
+      // Draw value labels based on budget range
+      ctx.font = "16px Arial";
+      ctx.fillStyle = "#333";
+      ctx.textAlign = "center";
+      ctx.fillText("0", centerX - radius + 20, centerY - 10);
+      ctx.fillText((budgetValue / 2).toLocaleString(), centerX, centerY - radius - 20);  // Half of the budget
+      ctx.fillText(budgetValue.toLocaleString(), centerX + radius - 20, centerY - 10);
+
+      // Display spent value inside the gauge
+      ctx.font = "bold 20px Arial";
+      ctx.fillStyle = "#333";
+      ctx.fillText(spentValue.toLocaleString() + " / " + budgetValue.toLocaleString(), centerX, centerY - 30);
+    }
+
+    // Update gauge dynamically
+    function updateGauge() {
+      var spentValue = 5700000;  // Simulating spent amount (e.g., $500,000)
+      var budgetValue = 7000000;  // Total budget (e.g., $1,000,000)
+      var title = "Budget vs. Spent";  // Dynamic title for the gauge
+
+      drawGauge(spentValue, budgetValue, title);
+
+      // Update every 2 seconds
+      setTimeout(updateGauge, 2000);
+    }
+
+    // Start updating the gauge when the page loads
+    updateGauge();
+  </script>
+
+</body>
+</html>
